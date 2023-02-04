@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
-    <title>Список всех резюме</title>
+    <title>Meals list</title>
 </head>
 <jsp:useBean id="meals" scope="request" type="java.util.List"/>
 <body>
@@ -37,10 +37,8 @@
                         <tbody>
                         <c:forEach items="${meals}" var="meal">
                             <jsp:useBean id="meal" type="ru.javawebinar.topjava.model.MealTo"/>
-                            <c:if test="${meal.excess == false}"><tr class="text-success"></c:if>
-                            <c:if test="${meal.excess == true}"><tr class="text-danger"></c:if>
-                            <td>${meal.date} ${meal.time}
-                            </td>
+                            <tr class="${meal.excess ? 'text-danger' : 'text-success'}">
+                            <td>${meal.date} ${meal.time}</td>
                             <td>${meal.description}</td>
                             <td>${meal.calories}</td>
                             <td>

@@ -18,7 +18,7 @@
                         <h2 class="">Meals list</h2>
                         <div class="d-flex ms-auto gap-2">
                             <button type="button" class="btn btn btn-outline-success"
-                                    onclick="location.href='meals?&action=create'"> Добавить
+                                    onclick="location.href='meals?action=create'"> Добавить
                                 <i class="bi bi-plus-circle"></i>
                             </button>
                         </div>

@@ -1,7 +1,6 @@
 package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
-import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.MealTo;
 import ru.javawebinar.topjava.storage.MealMemoryStorage;
 import ru.javawebinar.topjava.storage.MealStorage;
@@ -16,6 +15,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -31,27 +31,27 @@ public class MealServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         request.setCharacterEncoding("UTF-8");
-        log.debug("{} to {} with params{}", request.getMethod(), request.getRequestURL(), getAllRequestParams(request));
-        String id = request.getParameter("id");
+        if (log.isDebugEnabled()) {
+            log.debug("{} to {} with params{}", request.getMethod(), request.getRequestURL(), getAllRequestParams(request));
+        }
         LocalDateTime dateTime = LocalDateTime.parse(request.getParameter("dateTime"));
         String description = request.getParameter("description");
         int calories = Integer.parseInt(request.getParameter("calories"));
-        if (id.equals("")) {
-            mealStorage.create(new Meal(mealStorage.createId(), dateTime, description, calories));
-        } else if (mealStorage.get(Integer.parseInt(id)) != null) {
-            mealStorage.update(new Meal(Integer.parseInt(id), dateTime, description, calories));
+        int id = parseId(request.getParameter("id"));
+        if (id == -1) {
+            mealStorage.create(dateTime, description, calories);
+        } else {
+            mealStorage.update(id, dateTime, description, calories);
         }
         response.sendRedirect("meals");
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        log.debug("{} to {} with params{}", request.getMethod(), request.getRequestURL(), getAllRequestParams(request));
-        String action = request.getParameter("action");
-        if (action == null) {
-            forwardToMeals(request, response);
-            return;
+        if (log.isDebugEnabled()) {
+            log.debug("{} to {} with params{}", request.getMethod(), request.getRequestURL(), getAllRequestParams(request));
         }
+        String action = Optional.ofNullable(request.getParameter("action")).orElse("no-action");
         switch (action) {
             case "delete":
                 mealStorage.delete(Integer.parseInt(request.getParameter("id")));
@@ -70,6 +70,10 @@ public class MealServlet extends HttpServlet {
         }
         request.getRequestDispatcher("/editMeal.jsp").forward(request, response);
         log.debug("forward to editMeal.jsp");
+    }
+
+    private int parseId(String id) {
+        return !id.isEmpty() ? Integer.parseInt(id) : -1;
     }
 
     private String getAllRequestParams(HttpServletRequest request) {

@@ -6,15 +6,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
     <jsp:useBean id="meal" scope="request" type="ru.javawebinar.topjava.model.Meal"/>
-    <c:set var="action" value="${param.get('action')}" scope="request"/>
-    <c:choose>
-        <c:when test="${action == 'edit'}">
-            <c:set var="title" value="Edit meal"/>
-        </c:when>
-        <c:when test="${action == 'create'}">
-            <c:set var="title" value="Add meal"/>
-        </c:when>
-    </c:choose>
+    <c:set var="title" value="${param.get('action') == 'edit' ? 'Edit meal' : 'Add meal'}"/>
     <title>${title}</title>
 </head>
 <body>

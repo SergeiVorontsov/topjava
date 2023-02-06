@@ -9,9 +9,11 @@ public interface MealStorage {
 
     List<Meal> getAll();
 
-    Meal update(int id, LocalDateTime dateTime, String description, int calories);
+    Meal save(Meal meal);
 
-    Meal create(LocalDateTime dateTime, String description, int calories);
+    /*Meal update(Meal meal);
+
+    Meal create(Meal meal);*/
 
     void delete(int id);
 

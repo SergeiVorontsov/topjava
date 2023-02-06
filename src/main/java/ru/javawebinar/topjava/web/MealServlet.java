@@ -1,9 +1,10 @@
 package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
+import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.MealTo;
-import ru.javawebinar.topjava.storage.MealMemoryStorage;
 import ru.javawebinar.topjava.storage.MealStorage;
+import ru.javawebinar.topjava.storage.MemoryMealStorage;
 import ru.javawebinar.topjava.util.MealsUtil;
 
 import javax.servlet.ServletConfig;
@@ -26,7 +27,7 @@ public class MealServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        mealStorage = new MealMemoryStorage();
+        mealStorage = new MemoryMealStorage();
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -37,12 +38,13 @@ public class MealServlet extends HttpServlet {
         LocalDateTime dateTime = LocalDateTime.parse(request.getParameter("dateTime"));
         String description = request.getParameter("description");
         int calories = Integer.parseInt(request.getParameter("calories"));
-        int id = parseId(request.getParameter("id"));
-        if (id == -1) {
-            mealStorage.create(dateTime, description, calories);
+        Integer id = parseId(request.getParameter("id"));
+        mealStorage.save(new Meal(id, dateTime, description, calories));
+        /* if (id == null) {
+            mealStorage.create(new Meal(null,dateTime, description, calories));
         } else {
-            mealStorage.update(id, dateTime, description, calories);
-        }
+            mealStorage.update(new Meal(id, dateTime, description, calories));
+        }*/
         response.sendRedirect("meals");
     }
 
@@ -62,7 +64,7 @@ public class MealServlet extends HttpServlet {
                 request.setAttribute("meal", mealStorage.get(Integer.parseInt(request.getParameter("id"))));
                 break;
             case "create":
-                request.setAttribute("meal", MealsUtil.empty);
+                request.setAttribute("meal", MealsUtil.emptyMeal());
                 break;
             default:
                 forwardToMeals(request, response);
@@ -72,8 +74,8 @@ public class MealServlet extends HttpServlet {
         log.debug("forward to editMeal.jsp");
     }
 
-    private int parseId(String id) {
-        return !id.isEmpty() ? Integer.parseInt(id) : -1;
+    private Integer parseId(String id) {
+        return !id.isEmpty() ? Integer.parseInt(id) : null;
     }
 
     private String getAllRequestParams(HttpServletRequest request) {

@@ -12,9 +12,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class MealsUtil {
-    public static final Meal empty = new Meal(null, LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 0);
 
     public static final int CALORIES_PER_DAY = 2000;
+
+    public static Meal emptyMeal(){
+        return new Meal(null, LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 0);
+    }
 
     public static List<MealTo> listWithoutFilter(List<Meal> meals, int caloriesPerDay) {
         return filteredByStreams(meals, LocalTime.MIN, LocalTime.MAX, caloriesPerDay);

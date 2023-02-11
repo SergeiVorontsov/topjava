@@ -15,7 +15,7 @@ public class MealsUtil {
 
     public static final int CALORIES_PER_DAY = 2000;
 
-    public static Meal emptyMeal(){
+    public static Meal emptyMeal() {
         return new Meal(null, LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 0);
     }
 

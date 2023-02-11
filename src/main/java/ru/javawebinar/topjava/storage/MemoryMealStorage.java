@@ -31,7 +31,7 @@ public class MemoryMealStorage implements MealStorage {
                 new Meal(null, LocalDateTime.of(2020, Month.JANUARY, 31, 13, 0), "Обед", 500),
                 new Meal(null, LocalDateTime.of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 410)
         );
-        meals.forEach(MemoryMealStorage.this::save);
+        meals.forEach(this::save);
     }
 
     @Override
@@ -40,20 +40,6 @@ public class MemoryMealStorage implements MealStorage {
         log.debug("Get all meals. Quantity is {}", allMeals.size());
         return allMeals;
     }
-
-  /*  @Override
-    public Meal update(Meal meal) {
-        log.debug("Update meal: {}", meal);
-        return (storage.replace(meal.getId(), meal) != null) ? meal : null;
-    }
-
-    @Override
-    public Meal create(Meal meal) {
-        log.debug("Create meal: {}", meal);
-        meal.setId(createId());
-        storage.put(meal.getId(), meal);
-        return meal;
-    }*/
 
     @Override
     public Meal save(Meal meal) {

@@ -40,11 +40,6 @@ public class MealServlet extends HttpServlet {
         int calories = Integer.parseInt(request.getParameter("calories"));
         Integer id = parseId(request.getParameter("id"));
         mealStorage.save(new Meal(id, dateTime, description, calories));
-        /* if (id == null) {
-            mealStorage.create(new Meal(null,dateTime, description, calories));
-        } else {
-            mealStorage.update(new Meal(id, dateTime, description, calories));
-        }*/
         response.sendRedirect("meals");
     }
 

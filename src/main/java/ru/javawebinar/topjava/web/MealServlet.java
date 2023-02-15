@@ -35,10 +35,13 @@ public class MealServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         String id = request.getParameter("id");
 
-        Meal meal = new Meal(id.isEmpty() ? null : Integer.valueOf(id), null,
+        Meal meal = new Meal(
+                id.isEmpty() ? null : Integer.valueOf(id),
                 LocalDateTime.parse(request.getParameter("dateTime")),
                 request.getParameter("description"),
-                Integer.parseInt(request.getParameter("calories")));
+                Integer.parseInt(request.getParameter("calories")),
+                null
+        );
 
         log.info(meal.isNew() ? "Create {}" : "Update {}", meal);
         if (meal.isNew()) {
@@ -71,7 +74,13 @@ public class MealServlet extends HttpServlet {
             case "filter":
                 log.info("getFiltered");
                 request.setAttribute("meals",
-                        mealRestController.getFiltered(getStartDate(request), getStartTime(request), getEndDate(request), getEndTime(request)));
+                        mealRestController.getFiltered(
+                                getDate(request, "startDate"),
+                                getTime(request, "startTime"),
+                                getDate(request, "endDate"),
+                                getTime(request, "endTime")
+                        )
+                );
                 request.getRequestDispatcher("/meals.jsp").forward(request, response);
             case "all":
             default:
@@ -87,24 +96,14 @@ public class MealServlet extends HttpServlet {
         return Integer.parseInt(paramId);
     }
 
-    private LocalDate getStartDate(HttpServletRequest request) {
-        String paramStartDate = request.getParameter("startDate");
-        return paramStartDate.isEmpty() ? null : LocalDate.parse(paramStartDate);
-    }
-
-    private LocalDate getEndDate(HttpServletRequest request) {
-        String paramEndDate = request.getParameter("endDate");
+    private LocalDate getDate(HttpServletRequest request, String param) {
+        String paramEndDate = request.getParameter(param);
         return paramEndDate.isEmpty() ? null : LocalDate.parse(paramEndDate);
     }
 
-    private LocalTime getStartTime(HttpServletRequest request) {
-        String paramStartTime = request.getParameter("startTime");
+    private LocalTime getTime(HttpServletRequest request, String param) {
+        String paramStartTime = request.getParameter(param);
         return paramStartTime.isEmpty() ? null : LocalTime.parse(paramStartTime);
-    }
-
-    private LocalTime getEndTime(HttpServletRequest request) {
-        String paramEndTime = request.getParameter("endTime");
-        return paramEndTime.isEmpty() ? null : LocalTime.parse(paramEndTime);
     }
 
     @Override

@@ -4,7 +4,6 @@ import org.springframework.stereotype.Repository;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.MealsUtil;
-import ru.javawebinar.topjava.web.SecurityUtil;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,7 +22,7 @@ public class InMemoryMealRepository implements MealRepository {
     private final AtomicInteger counter = new AtomicInteger(0);
 
     {
-        MealsUtil.meals.forEach(meal -> InMemoryMealRepository.this.save(meal, SecurityUtil.authUserId()));
+        MealsUtil.meals.forEach(meal -> InMemoryMealRepository.this.save(meal, 1));
         this.save(new Meal(LocalDateTime.now(), "Чужая еда", 5000), 2);
     }
 
@@ -51,8 +50,8 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public Meal get(int id, int userId) {
-        Meal result;
-        return ((result = repository.get(id)) != null && result.getUserId() == userId) ? result : null;
+        Meal result = repository.get(id);
+        return (result != null && result.getUserId() == userId) ? result : null;
     }
 
     @Override

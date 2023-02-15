@@ -21,7 +21,7 @@ import java.util.Objects;
 public class MealServlet extends HttpServlet {
     private static final Logger log = LoggerFactory.getLogger(MealServlet.class);
 
-    ConfigurableApplicationContext context;
+    private ConfigurableApplicationContext context;
     private MealRestController mealRestController;
 
     @Override
@@ -89,27 +89,26 @@ public class MealServlet extends HttpServlet {
 
     private LocalDate getStartDate(HttpServletRequest request) {
         String paramStartDate = request.getParameter("startDate");
-        return paramStartDate.isEmpty() ? LocalDate.MIN : LocalDate.parse(paramStartDate);
+        return paramStartDate.isEmpty() ? null : LocalDate.parse(paramStartDate);
     }
 
     private LocalDate getEndDate(HttpServletRequest request) {
         String paramEndDate = request.getParameter("endDate");
-        return paramEndDate.isEmpty() ? LocalDate.MAX.minusDays(1) : LocalDate.parse(paramEndDate);
+        return paramEndDate.isEmpty() ? null : LocalDate.parse(paramEndDate);
     }
 
     private LocalTime getStartTime(HttpServletRequest request) {
         String paramStartTime = request.getParameter("startTime");
-        return paramStartTime.isEmpty() ? LocalTime.MIN : LocalTime.parse(paramStartTime);
+        return paramStartTime.isEmpty() ? null : LocalTime.parse(paramStartTime);
     }
 
     private LocalTime getEndTime(HttpServletRequest request) {
         String paramEndTime = request.getParameter("endTime");
-        return paramEndTime.isEmpty() ? LocalTime.MAX : LocalTime.parse(paramEndTime);
+        return paramEndTime.isEmpty() ? null : LocalTime.parse(paramEndTime);
     }
 
     @Override
     public void destroy() {
-        super.destroy();
         context.close();
     }
 }

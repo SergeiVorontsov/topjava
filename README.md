@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/bee16f3145654047a0505c62aeefd8a2)](https://www.codacy.com/gh/JavaWebinar/topjava/dashboard)
 
 Java Enterprise Online Project
@@ -147,3 +148,7 @@ Maven/ Spring/ Security/ JPA(Hibernate)/ REST(Jackson)/ Bootstrap(CSS)/ jQuery +
 
 ### 14.05.23: Дедлайн на сдачу [выпускного проекта](https://github.com/JavaOPs/topjava/blob/master/graduation.md)
 ### 24.05.23: Получение дипломов для участников [Дипломной программы](https://javaops.ru/view/register/diploma)
+=======
+# topjava
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/766d40ee05ba4598b446abbbe64fb4a3)](https://www.codacy.com/gh/SergeiVorontsov/topjava/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=SergeiVorontsov/topjava&amp;utm_campaign=Badge_Grade)
+>>>>>>> origin/master

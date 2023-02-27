@@ -12,7 +12,6 @@ import java.time.LocalTime;
 
 @NamedQueries({
         @NamedQuery(name = Meal.DELETE, query = "DELETE FROM Meal m WHERE m.id=:id AND m.user.id =:user_id"),
-        @NamedQuery(name = Meal.GET, query = "SELECT m FROM Meal m WHERE m.id=:id AND m.user.id =:user_id"),
         @NamedQuery(name = Meal.ALL_SORTED, query = "SELECT m FROM Meal m WHERE m.user.id =: user_id ORDER BY m.dateTime DESC"),
         @NamedQuery(name = Meal.BETWEEN, query = "SELECT m FROM Meal m " +
                 "WHERE m.user.id =: user_id AND m.dateTime >=:start_date_time AND m.dateTime <: end_date_time " +
@@ -22,7 +21,6 @@ import java.time.LocalTime;
 @Table(name = "meal", uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "date_time" })})
 public class Meal extends AbstractBaseEntity {
     public static final String DELETE = "Meal.delete";
-    public static final String GET = "Meal.get";
     public static final String BETWEEN = "Meal.getBetween";
     public static final String ALL_SORTED = "Meal.getAllSorted";
 

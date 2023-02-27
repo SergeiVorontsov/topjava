@@ -44,7 +44,6 @@ public class MealServiceTest {
     public void delete() {
         service.delete(MEAL1_ID, USER_ID);
         assertThrows(NotFoundException.class, () -> service.get(MEAL1_ID, USER_ID));
-
     }
 
     @Test

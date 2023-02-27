@@ -10,6 +10,7 @@ import ru.javawebinar.topjava.repository.MealRepository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -23,14 +24,16 @@ public class JpaMealRepository implements MealRepository {
     @Transactional
     public Meal save(Meal meal, int userId) {
         User ref = em.getReference(User.class, userId);
-        meal.setUser(ref);
+        Meal foundMeal;
         if (meal.isNew()) {
+            meal.setUser(ref);
             em.persist(meal);
             return meal;
-        } else if (em.find(Meal.class, meal.getId()).getUser().getId() != userId) {
-            return null;
+        } else if ((foundMeal = em.find(Meal.class, meal.getId())) != null && foundMeal.getUser().getId() == userId) {
+            meal.setUser(ref);
+            return em.merge(meal);
         }
-        return em.merge(meal);
+        return null;
     }
 
     @Override
@@ -45,11 +48,8 @@ public class JpaMealRepository implements MealRepository {
     @Override
     @Transactional
     public Meal get(int id, int userId) {
-        List<Meal> meals = em.createNamedQuery(Meal.GET, Meal.class)
-                .setParameter("id", id)
-                .setParameter("user_id", userId)
-                .getResultList();
-        return DataAccessUtils.singleResult(meals);
+        Meal meal = em.find(Meal.class, id);
+        return (meal != null && meal.getUser().getId() == userId) ? meal : DataAccessUtils.singleResult(Collections.emptyList());
     }
 
     @Override

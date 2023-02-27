@@ -6,6 +6,7 @@ import org.junit.runner.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 public class StopwatchTestRule {
@@ -22,7 +23,7 @@ public class StopwatchTestRule {
         }
     };
 
-    private static final String DELIM = "-".repeat(103);
+    private static final String DELIM = String.join("", Collections.nCopies(103, "-"));
 
     public static final ExternalResource SUMMARY = new ExternalResource() {
 

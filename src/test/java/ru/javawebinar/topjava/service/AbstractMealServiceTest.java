@@ -15,16 +15,12 @@ import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
 import static ru.javawebinar.topjava.UserTestData.USER_ID;
 
-abstract public class AbstractMealServiceTest extends AbstractBaseServiceTest {
+public abstract class AbstractMealServiceTest extends AbstractBaseServiceTest {
 
     private static final String cacheName = "meals";
 
     @Autowired
     private MealService service;
-
-    public AbstractMealServiceTest() {
-        super(cacheName);
-    }
 
     @Test
     public void delete() {

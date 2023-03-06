@@ -1,13 +1,9 @@
 package ru.javawebinar.topjava.repository.datajpa;
 
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.MealRepository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -16,19 +12,17 @@ import java.util.Optional;
 public class DataJpaMealRepository implements MealRepository {
 
     private final CrudMealRepository crudRepository;
+    private final CrudUserRepository crudUserRepository;
 
-    @PersistenceContext
-    private EntityManager em;
-
-    public DataJpaMealRepository(CrudMealRepository crudRepository) {
+    public DataJpaMealRepository(CrudMealRepository crudRepository, CrudUserRepository crudUserRepository) {
         this.crudRepository = crudRepository;
+        this.crudUserRepository = crudUserRepository;
     }
 
-    @Transactional
     @Override
     public Meal save(Meal meal, int userId) {
-        if (meal.isNew() || get(meal.id(), userId) != null) {
-            meal.setUser(em.getReference(User.class, userId));
+        if (meal.isNew() || (get(meal.id(), userId) != null)) {
+            meal.setUser(crudUserRepository.getReferenceById(userId));
             return crudRepository.save(meal);
         }
         return null;
@@ -42,8 +36,9 @@ public class DataJpaMealRepository implements MealRepository {
     @Override
     public Meal get(int id, int userId) {
         Optional<Meal> meal = crudRepository.findById(id);
-        return (meal.isPresent() && Optional.ofNullable(meal.get().getUser().getId()).orElse(0) == userId)
-                ? meal.get() : null;
+        return (meal.map(Meal::getUser)
+                .filter(user -> user.getId() == userId)
+                .isPresent()) ? meal.get() : null;
     }
 
     @Override
@@ -54,5 +49,9 @@ public class DataJpaMealRepository implements MealRepository {
     @Override
     public List<Meal> getBetweenHalfOpen(LocalDateTime startDateTime, LocalDateTime endDateTime, int userId) {
         return crudRepository.getBetweenHalfOpen(startDateTime, endDateTime, userId);
+    }
+
+    public Meal getWithUser(int id, int userId) {
+        return crudRepository.getWithUser(id, userId);
     }
 }

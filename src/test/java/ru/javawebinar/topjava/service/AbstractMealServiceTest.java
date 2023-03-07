@@ -17,10 +17,8 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 
 public abstract class AbstractMealServiceTest extends AbstractBaseServiceTest {
 
-    private static final String cacheName = "meals";
-
     @Autowired
-    private MealService service;
+    protected MealService service;
 
     @Test
     public void delete() {

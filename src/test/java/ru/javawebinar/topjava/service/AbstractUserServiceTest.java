@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.dao.DataAccessException;
+import org.springframework.test.context.jdbc.Sql;
 import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
@@ -18,7 +19,7 @@ import static ru.javawebinar.topjava.UserTestData.*;
 public abstract class AbstractUserServiceTest extends AbstractBaseServiceTest {
 
     @Autowired
-    private UserService service;
+    protected UserService service;
 
     @Autowired
     private CacheManager cacheManager;
@@ -73,6 +74,7 @@ public abstract class AbstractUserServiceTest extends AbstractBaseServiceTest {
     }
 
     @Test
+    @Sql(scripts = "classpath:db/populateDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     public void update() {
         User updated = getUpdated();
         service.update(updated);

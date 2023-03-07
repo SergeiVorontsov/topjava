@@ -1,7 +1,5 @@
 package ru.javawebinar.topjava.model;
 
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.util.CollectionUtils;
 
@@ -57,7 +55,6 @@ public class User extends AbstractNamedEntity {
     private int caloriesPerDay = DEFAULT_CALORIES_PER_DAY;
 
     @OneToMany(mappedBy = "user")
-    @LazyCollection(LazyCollectionOption.TRUE)
     private List<Meal> meals;
 
     public User() {
@@ -131,7 +128,7 @@ public class User extends AbstractNamedEntity {
     }
 
     public void setMeals(List<Meal> meals) {
-        this.meals = CollectionUtils.isEmpty(meals) ? Collections.<Meal>emptyList() : List.copyOf(meals);
+        this.meals = CollectionUtils.isEmpty(meals) ? Collections.emptyList() : List.copyOf(meals);
     }
 
     public String getPassword() {
@@ -147,7 +144,6 @@ public class User extends AbstractNamedEntity {
                 ", enabled=" + enabled +
                 ", roles=" + roles +
                 ", caloriesPerDay=" + caloriesPerDay +
-                ", meals=" + meals +
                 '}';
     }
 }

@@ -30,6 +30,7 @@ public abstract class AbstractUserServiceTest extends AbstractBaseServiceTest {
     }
 
     @Test
+    @Sql(scripts = "classpath:db/populateDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     public void create() {
         User created = service.create(getNew());
         int newId = created.id();
@@ -46,6 +47,7 @@ public abstract class AbstractUserServiceTest extends AbstractBaseServiceTest {
     }
 
     @Test
+    @Sql(scripts = "classpath:db/populateDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     public void delete() {
         service.delete(USER_ID);
         assertThrows(NotFoundException.class, () -> service.get(USER_ID));

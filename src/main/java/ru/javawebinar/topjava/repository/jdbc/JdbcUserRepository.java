@@ -10,12 +10,11 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.Validator;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -24,9 +23,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static ru.javawebinar.topjava.util.Util.jdbcValidateBean;
+
 @Repository
 @Transactional(readOnly = true)
-@Validated
 public class JdbcUserRepository implements UserRepository {
 
     private static final BeanPropertyRowMapper<User> ROW_MAPPER = BeanPropertyRowMapper.newInstance(User.class);
@@ -36,6 +36,10 @@ public class JdbcUserRepository implements UserRepository {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private final SimpleJdbcInsert insertUser;
+
+    @Autowired
+    private Validator validator;
+
 
     @Autowired
     public JdbcUserRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
@@ -50,6 +54,8 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     @Transactional
     public User save(User user) {
+        jdbcValidateBean(user, validator);
+
         BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(user);
 
         if (user.isNew()) {
@@ -70,13 +76,13 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     @Transactional
-    public boolean delete(@NotNull int id) {
+    public boolean delete(int id) {
         return jdbcTemplate.update("DELETE FROM users WHERE id=?", id) != 0;
     }
 
     @Override
     @Transactional
-    public User get(@NotNull int id) {
+    public User get(int id) {
         List<User> users = jdbcTemplate.query("SELECT * FROM users WHERE id=?", ROW_MAPPER, id);
         if (users.size() == 1) {
             List<Role> userRoles = getUserRoles(id);
@@ -87,7 +93,7 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     @Transactional
-    public User getByEmail(@NotNull String email) {
+    public User getByEmail(String email) {
 //        return jdbcTemplate.queryForObject("SELECT * FROM users WHERE email=?", ROW_MAPPER, email);
         List<User> users = jdbcTemplate.query("SELECT * FROM users WHERE email=?", ROW_MAPPER, email);
         if (users.size() == 1) {
@@ -107,7 +113,7 @@ public class JdbcUserRepository implements UserRepository {
         return users;
     }
 
-    private List<Role> getUserRoles(@NotNull int userId) {
+    private List<Role> getUserRoles(int userId) {
         return jdbcTemplate.queryForList("SELECT role FROM user_role WHERE user_id=?", Role.class, userId);
     }
 
@@ -124,15 +130,15 @@ public class JdbcUserRepository implements UserRepository {
         });
     }
 
-    private Set<Role> upsertRoles(@NotNull int userId,@NotNull Set<Role> roles) {
+    private Set<Role> upsertRoles(int userId, Set<Role> roles) {
         return (deleteRoles(userId) && (insertRoles(userId, roles) != null)) ? roles : null;
     }
 
-    private boolean deleteRoles(@NotNull int userId) {
+    private boolean deleteRoles(int userId) {
         return jdbcTemplate.update("DELETE FROM user_role WHERE user_id=?", userId) != 0;
     }
 
-    private Set<Role> insertRoles(@NotNull int userId, @NotNull Set<Role> roles) {
+    private Set<Role> insertRoles(int userId, Set<Role> roles) {
         int[] result = jdbcTemplate.batchUpdate("INSERT INTO user_role VALUES (?,?)", new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {

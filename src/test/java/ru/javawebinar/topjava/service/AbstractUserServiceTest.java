@@ -1,7 +1,10 @@
 package ru.javawebinar.topjava.service;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataAccessException;
 import ru.javawebinar.topjava.UserTestData;
@@ -17,7 +20,6 @@ import java.util.Set;
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.UserTestData.*;
 
-@Cacheable(value = "users", cacheManager = "noOpCacheManager")
 public abstract class AbstractUserServiceTest extends AbstractServiceTest {
 
     @Autowired
@@ -87,5 +89,25 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
         validateRootCause(ConstraintViolationException.class, () -> service.create(new User(null, "User", "mail@yandex.ru", "  ", Role.USER)));
         validateRootCause(ConstraintViolationException.class, () -> service.create(new User(null, "User", "mail@yandex.ru", "password", 9, true, new Date(), Set.of())));
         validateRootCause(ConstraintViolationException.class, () -> service.create(new User(null, "User", "mail@yandex.ru", "password", 10001, true, new Date(), Set.of())));
+    }
+
+    @Test
+    public void createWithoutException() {
+        service.create(new User(null, "User1", "mail1@yandex.ru", "password", 2000, true, new Date(), Set.of()));
+        service.create(new User(null, "User", "mail@yandex.ru", "password", Role.USER, Role.ADMIN));
+    }
+
+    @Test
+    public void updateWithMultipleRoles() {
+        User user = new User(guest);
+        user.setRoles(Set.of(Role.USER, Role.ADMIN));
+        service.update(user);
+    }
+
+    @Test
+    public void updateWithEmptyRoles() {
+        User user = new User(admin);
+        user.setRoles(Set.of());
+        service.update(user);
     }
 }

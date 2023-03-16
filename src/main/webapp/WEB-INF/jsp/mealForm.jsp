@@ -14,10 +14,10 @@
 <spring:message code="common.cancel" scope="request" var="cancel"/>
 <spring:message code="common.save" scope="request" var="save"/>
 <section>
-    <h3>${requestScope.get("org.springframework.web.util.UrlPathHelper.PATH") == "/meals/create" ? create : edit}</h3>
+    <h3>${meal.id == null ? create : edit}</h3>
     <hr>
     <jsp:useBean id="meal" type="ru.javawebinar.topjava.model.Meal" scope="request"/>
-    <form method="post" action="save">
+    <form method="post" action="meals">
         <input type="hidden" name="id" value="${meal.id}">
         <dl>
             <dt>${dateTime}</dt>

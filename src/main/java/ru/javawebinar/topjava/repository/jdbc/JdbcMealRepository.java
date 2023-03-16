@@ -17,7 +17,7 @@ import javax.validation.Validator;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static ru.javawebinar.topjava.util.Util.jdbcValidateBean;
+import static ru.javawebinar.topjava.util.ValidationUtil.validateBean;
 
 @Repository
 @Transactional(readOnly = true)
@@ -46,7 +46,7 @@ public class JdbcMealRepository implements MealRepository {
     @Override
     @Transactional
     public Meal save(Meal meal, int userId) {
-        jdbcValidateBean(meal, validator);
+        validateBean(meal, validator);
 
         MapSqlParameterSource map = new MapSqlParameterSource()
                 .addValue("id", meal.getId())

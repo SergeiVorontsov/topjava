@@ -9,10 +9,9 @@
 <jsp:include page="fragments/bodyHeader.jsp"/>
 <spring:message code="common.update" scope="request" var="update"/>
 <spring:message code="common.delete" scope="request" var="delete"/>
-
 <section>
     <h3><spring:message code="meal.title"/></h3>
-    <form method="get" action="${pageContext.request.contextPath}/meals/filter">
+    <form method="get" action="meals/filter">
         <input type="hidden" name="action" value="filter">
         <dl>
             <dt><spring:message code="filter.from.date"/>:</dt>

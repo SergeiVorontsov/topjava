@@ -1,11 +1,7 @@
 package ru.javawebinar.topjava.service;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataAccessException;
 import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.Role;
@@ -92,9 +88,17 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    public void createWithoutException() {
-        service.create(new User(null, "User1", "mail1@yandex.ru", "password", 2000, true, new Date(), Set.of()));
-        service.create(new User(null, "User", "mail@yandex.ru", "password", Role.USER, Role.ADMIN));
+    public void createWithoutRoles() {
+        User user = new User(null, "User1", "mail1@yandex.ru", "password", 2000, true, new Date(), Set.of());
+        service.create(user);
+        USER_MATCHER.assertMatch(service.get(user.id()), user);
+    }
+
+    @Test
+    public void createWithMultipleRoles() {
+        User user = new User(null, "User", "mail@yandex.ru", "password", Role.USER, Role.ADMIN);
+        service.create(user);
+        USER_MATCHER.assertMatch(service.get(user.id()), user);
     }
 
     @Test
@@ -102,6 +106,7 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
         User user = new User(guest);
         user.setRoles(Set.of(Role.USER, Role.ADMIN));
         service.update(user);
+        USER_MATCHER.assertMatch(service.get(GUEST_ID), user);
     }
 
     @Test
@@ -109,5 +114,6 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
         User user = new User(admin);
         user.setRoles(Set.of());
         service.update(user);
+        USER_MATCHER.assertMatch(service.get(ADMIN_ID), user);
     }
 }

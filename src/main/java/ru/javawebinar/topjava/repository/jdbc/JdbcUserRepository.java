@@ -17,10 +17,7 @@ import ru.javawebinar.topjava.repository.UserRepository;
 import javax.validation.Validator;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static ru.javawebinar.topjava.util.ValidationUtil.validateBean;
 
@@ -38,7 +35,6 @@ public class JdbcUserRepository implements UserRepository {
 
     @Autowired
     private Validator validator;
-
 
     @Autowired
     public JdbcUserRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
@@ -64,8 +60,8 @@ public class JdbcUserRepository implements UserRepository {
         } else if ((namedParameterJdbcTemplate.update("""
                    UPDATE users SET name=:name, email=:email, password=:password, registered=:registered,
                    enabled=:enabled, calories_per_day=:caloriesPerDay WHERE id=:id
-                """, parameterSource) == 0)
-                || (updateRoles(user.id(), user.getRoles()) == null)) {
+                """, parameterSource) == 0 || updateRoles(user.id(), user.getRoles()) == 0)
+        ) {
             return null;
         }
         return user;
@@ -73,10 +69,11 @@ public class JdbcUserRepository implements UserRepository {
 
     private void insertRoles(int userId, Set<Role> roles) {
         if (!roles.isEmpty()) {
+            List<Role> rolesList = roles.stream().toList();
             jdbcTemplate.batchUpdate("INSERT INTO user_role VALUES (?,?)", new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(PreparedStatement ps, int i) throws SQLException {
-                    ps.setString(2, roles.stream().toList().get(i).toString());
+                    ps.setString(2, rolesList.get(i).toString());
                     ps.setInt(1, userId);
                 }
 
@@ -88,10 +85,10 @@ public class JdbcUserRepository implements UserRepository {
         }
     }
 
-    private Set<Role> updateRoles(int userId, Set<Role> roles) {
+    private int updateRoles(int userId, Set<Role> roles) {
         deleteRoles(userId);
         insertRoles(userId, roles);
-        return roles;
+        return 1;
     }
 
     private boolean deleteRoles(int userId) {
@@ -108,8 +105,12 @@ public class JdbcUserRepository implements UserRepository {
     public User get(int id) {
         List<User> users = jdbcTemplate.query("SELECT * FROM users WHERE id=?", ROW_MAPPER, id);
         User user = DataAccessUtils.singleResult(users);
+        return getAndSetRoles(user);
+    }
+
+    private User getAndSetRoles(User user) {
         if (user != null) {
-            List<Role> userRoles = getUserRoles(id);
+            List<Role> userRoles = getUserRoles(user.id());
             user.setRoles(userRoles);
         }
         return user;
@@ -124,39 +125,28 @@ public class JdbcUserRepository implements UserRepository {
 //        return jdbcTemplate.queryForObject("SELECT * FROM users WHERE email=?", ROW_MAPPER, email);
         List<User> users = jdbcTemplate.query("SELECT * FROM users WHERE email=?", ROW_MAPPER, email);
         User user = DataAccessUtils.singleResult(users);
-        if (user != null) {
-            List<Role> userRoles = getUserRoles(user.id());
-            user.setRoles(userRoles);
-        }
-        return user;
+        return getAndSetRoles(user);
     }
 
     @Override
     public List<User> getAll() {
         List<User> users = jdbcTemplate.query("SELECT * FROM users ORDER BY name, email", ROW_MAPPER);
-        HashMap<Integer, EnumSet<Role>> roles = getAllRoles();
+        Map<Integer, EnumSet<Role>> roles = getAllRoles();
         users.forEach(user -> user.setRoles(roles.get(user.id())));
         return users;
     }
 
-    private HashMap<Integer, EnumSet<Role>> getAllRoles() {
+    private Map<Integer, EnumSet<Role>> getAllRoles() {
         return jdbcTemplate.query("SELECT * FROM user_role", rs -> {
-            HashMap<Integer, EnumSet<Role>> result = new HashMap<>();
+            Map<Integer, EnumSet<Role>> result = new HashMap<>();
             while (rs.next()) {
-                Integer key = rs.getInt("user_id");
+                Integer userId = rs.getInt("user_id");
                 Role role = Role.valueOf(rs.getString("role"));
-                result.compute(key, (k, v) -> {
-                    if (v == null) {
-                        return EnumSet.of(role);
-                    } else {
-                        v.add(role);
-                        return v;
-                    }
-                });
+                result.computeIfAbsent(userId, (id) -> EnumSet.of(role));
+                result.get(userId).add(role);
             }
             return result;
         });
-
     }
 }
 

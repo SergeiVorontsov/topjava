@@ -14,7 +14,7 @@
 <spring:message code="common.cancel" scope="request" var="cancel"/>
 <spring:message code="common.save" scope="request" var="save"/>
 <section>
-    <h3>${meal.id == null ? create : edit}</h3>
+    <h3>${meal.isNew() ? create : edit}</h3>
     <hr>
     <jsp:useBean id="meal" type="ru.javawebinar.topjava.model.Meal" scope="request"/>
     <form method="post" action="meals">

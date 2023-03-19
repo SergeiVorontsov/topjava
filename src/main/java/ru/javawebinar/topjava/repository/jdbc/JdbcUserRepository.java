@@ -60,8 +60,9 @@ public class JdbcUserRepository implements UserRepository {
         } else if ((namedParameterJdbcTemplate.update("""
                    UPDATE users SET name=:name, email=:email, password=:password, registered=:registered,
                    enabled=:enabled, calories_per_day=:caloriesPerDay WHERE id=:id
-                """, parameterSource) == 0 || updateRoles(user.id(), user.getRoles()) == 0)
-        ) {
+                """, parameterSource) != 0)) {
+            updateRoles(user.id(), user.getRoles());
+        } else {
             return null;
         }
         return user;
@@ -69,7 +70,7 @@ public class JdbcUserRepository implements UserRepository {
 
     private void insertRoles(int userId, Set<Role> roles) {
         if (!roles.isEmpty()) {
-            List<Role> rolesList = roles.stream().toList();
+            List<Role> rolesList = new ArrayList<>(roles);
             jdbcTemplate.batchUpdate("INSERT INTO user_role VALUES (?,?)", new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(PreparedStatement ps, int i) throws SQLException {
@@ -85,14 +86,13 @@ public class JdbcUserRepository implements UserRepository {
         }
     }
 
-    private int updateRoles(int userId, Set<Role> roles) {
+    private void updateRoles(int userId, Set<Role> roles) {
         deleteRoles(userId);
         insertRoles(userId, roles);
-        return 1;
     }
 
-    private boolean deleteRoles(int userId) {
-        return jdbcTemplate.update("DELETE FROM user_role WHERE user_id=?", userId) != 0;
+    private void deleteRoles(int userId) {
+        jdbcTemplate.update("DELETE FROM user_role WHERE user_id=?", userId);
     }
 
     @Override
@@ -140,10 +140,9 @@ public class JdbcUserRepository implements UserRepository {
         return jdbcTemplate.query("SELECT * FROM user_role", rs -> {
             Map<Integer, EnumSet<Role>> result = new HashMap<>();
             while (rs.next()) {
-                Integer userId = rs.getInt("user_id");
+                int userId = rs.getInt("user_id");
                 Role role = Role.valueOf(rs.getString("role"));
-                result.computeIfAbsent(userId, (id) -> EnumSet.of(role));
-                result.get(userId).add(role);
+                result.computeIfAbsent(userId, (id) -> EnumSet.noneOf(Role.class)).add(role);
             }
             return result;
         });

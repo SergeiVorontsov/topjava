@@ -74,7 +74,7 @@ public class JdbcUserRepository implements UserRepository {
             jdbcTemplate.batchUpdate("INSERT INTO user_role VALUES (?,?)", new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(PreparedStatement ps, int i) throws SQLException {
-                    ps.setString(2, rolesList.get(i).toString());
+                    ps.setString(2, rolesList.get(i).name());
                     ps.setInt(1, userId);
                 }
 

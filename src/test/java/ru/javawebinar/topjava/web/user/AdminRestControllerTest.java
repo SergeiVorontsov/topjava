@@ -3,6 +3,7 @@ package ru.javawebinar.topjava.web.user;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.junit.jupiter.EnabledIf;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.javawebinar.topjava.UserTestData;
@@ -90,6 +91,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    @EnabledIf(expression = "#{environment['spring.profiles.active'] == 'DATAJPA'}", loadContext = true)
     void getWithMeals() throws Exception {
         User adminWithMeal = new User(admin);
         adminWithMeal.setMeals(List.of(adminMeal2, adminMeal1));

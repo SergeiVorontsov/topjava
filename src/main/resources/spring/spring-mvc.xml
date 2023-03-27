@@ -35,18 +35,6 @@
                 </bean>
             </set>
         </property>
-        <property name="converters">
-            <set>
-                <bean id="stringToLocalDateConverter"
-                      class="ru.javawebinar.topjava.util.converter.StringToLocalDateConverter">
-                    <constructor-arg type="java.lang.String" value="yyyy-MM-dd"/>
-                </bean>
-                <bean id="stringToLocalTimeConverter"
-                      class="ru.javawebinar.topjava.util.converter.StringToLocalTimeConverter">
-                    <constructor-arg type="java.lang.String" value="HH:mm"/>
-                </bean>
-            </set>
-        </property>
     </bean>
 
     <context:component-scan base-package="ru.javawebinar.**.web"/>

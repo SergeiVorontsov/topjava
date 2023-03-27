@@ -22,7 +22,7 @@ public class CustomTimeFormatter implements Formatter<LocalTime> {
     }
 
 
-    public @Nullable LocalTime parse(@Nullable String text, Locale locale) throws ParseException {
-        return StringUtils.hasLength(text) || !StringUtils.hasText("null") ? LocalTime.parse(text, formatter) : null;
+    public @Nullable LocalTime parse(String text, Locale locale) throws ParseException {
+        return StringUtils.hasLength(text) ? LocalTime.parse(text, formatter) : null;
     }
 }

@@ -1,7 +1,6 @@
 package ru.javawebinar.topjava.util.formatter;
 
 import org.springframework.format.Formatter;
-import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 import java.text.ParseException;
@@ -17,12 +16,12 @@ public class CustomDateFormatter implements Formatter<LocalDate> {
     }
 
     @Override
-    public String print( LocalDate date, Locale locale) {
+    public String print(LocalDate date, Locale locale) {
         return date.toString();
     }
 
 
-    public @Nullable LocalDate parse(@Nullable String text, Locale locale) throws ParseException {
-        return StringUtils.hasLength(text) || !StringUtils.hasText("null") ? LocalDate.parse(text, formatter) : null;
+    public LocalDate parse(String text, Locale locale) throws ParseException {
+        return StringUtils.hasLength(text) ? LocalDate.parse(text, formatter) : null;
     }
 }

@@ -50,7 +50,7 @@ class ProfileRestControllerTest extends AbstractControllerTest {
 
     @Test
     @EnabledIf(
-            expression = "#{environment.acceptsProfiles(T(ru.javawebinar.topjava.Profiles).getActiveRepositoryProfile)}",
+            expression = "#{environment.acceptsProfiles('datajpa')}",
             loadContext = true)
     void getWithMeals() throws Exception {
         User userWithMeal = new User(user);

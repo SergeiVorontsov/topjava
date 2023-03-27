@@ -49,7 +49,9 @@ class ProfileRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    @EnabledIf(expression = "#{environment['spring.profiles.active'] == 'DATAJPA'}", loadContext = true)
+    @EnabledIf(
+            expression = "#{environment.acceptsProfiles(T(ru.javawebinar.topjava.Profiles).getActiveRepositoryProfile)}",
+            loadContext = true)
     void getWithMeals() throws Exception {
         User userWithMeal = new User(user);
         userWithMeal.setMeals(meals);

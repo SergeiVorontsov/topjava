@@ -22,7 +22,7 @@
 --header 'Content-Type: application/json' \
 --data '{
 "dateTime":"2020-02-01T18:00:00",
-"description":"Созданный ужин",
+"description":"РЎРѕР·РґР°РЅРЅС‹Р№ СѓР¶РёРЅ",
 "calories":300
 }'`
 
@@ -30,7 +30,7 @@
 
 `curl --location --request PUT 'http://localhost:8090/topjava/rest/meals/100003' \
 --header 'Content-Type: application/json' \
---data '{"id":100003,"dateTime":"2020-01-30T10:02:00","description":"Обновленный завтрак","calories":200}'`
+--data '{"id":100003,"dateTime":"2020-01-30T10:02:00","description":"РћР±РЅРѕРІР»РµРЅРЅС‹Р№ Р·Р°РІС‚СЂР°Рє","calories":200}'`
 
 #### filter
 

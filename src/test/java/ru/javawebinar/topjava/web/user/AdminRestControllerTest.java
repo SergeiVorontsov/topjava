@@ -91,7 +91,9 @@ class AdminRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    @EnabledIf(expression = "#{environment['spring.profiles.active'] == 'DATAJPA'}", loadContext = true)
+    @EnabledIf(
+            expression = "#{environment.acceptsProfiles(T(ru.javawebinar.topjava.Profiles).getActiveRepositoryProfile)}",
+            loadContext = true)
     void getWithMeals() throws Exception {
         User adminWithMeal = new User(admin);
         adminWithMeal.setMeals(List.of(adminMeal2, adminMeal1));

@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import ru.javawebinar.topjava.Profiles;
 import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.service.UserService;
@@ -92,9 +93,10 @@ class AdminRestControllerTest extends AbstractControllerTest {
 
     @Test
     @EnabledIf(
-            expression = "#{environment.acceptsProfiles('datajpa')}",
+            expression = "#{environment.acceptsProfiles(T(ru.javawebinar.topjava.Profiles).DATAJPA)}",
             loadContext = true)
     void getWithMeals() throws Exception {
+
         User adminWithMeal = new User(admin);
         adminWithMeal.setMeals(List.of(adminMeal2, adminMeal1));
         perform(MockMvcRequestBuilders.get(REST_URL + ADMIN_ID + "/with-meals"))

@@ -42,6 +42,20 @@ $(function () {
                     "asc"
                 ]
             ]
+        }),
+        $(":input").change(function () {
+            setEnabledUser($(this).closest('tr').attr("id"), $(this).prop("checked"));
         })
     );
 });
+
+function setEnabledUser(id, checked) {
+    $.ajax({
+        type: "POST",
+        url: ctx.ajaxUrl + "enabled",
+        data: {id: id, enabled: checked},
+    }).done(function () {
+        updateTable();
+        successNoty("Set successful");
+    });
+}

@@ -2,7 +2,10 @@ const userAjaxUrl = "admin/users/";
 
 // https://stackoverflow.com/a/5064235/548473
 const ctx = {
-    ajaxUrl: userAjaxUrl
+    ajaxUrl: userAjaxUrl,
+    updateTable: function () {
+        $.get(userAjaxUrl, updateTableByData);
+    }
 };
 
 // $(document).ready(function () {
@@ -43,19 +46,28 @@ $(function () {
                 ]
             ]
         }),
-        $(":input").change(function () {
-            setEnabledUser($(this).closest('tr').attr("id"), $(this).prop("checked"));
-        })
     );
 });
 
-function setEnabledUser(id, checked) {
+
+$('#datatable').on('change', ':input[name="enabled"]', function () {
+    let row = $(this).closest('tr');
+    let id = $(row).attr("id");
+    let checked = $(this).prop("checked");
+
     $.ajax({
         type: "POST",
-        url: ctx.ajaxUrl + "enabled",
+        url: ctx.ajaxUrl + "enable",
         data: {id: id, enabled: checked},
     }).done(function () {
-        updateTable();
-        successNoty("Set successful");
+        switch (checked) {
+            case true:
+                row.attr('data-user-enabled', "true");
+                successNoty("Enabled successful");
+                break;
+            case false:
+                row.attr('data-user-enabled', "false");
+                successNoty("Disabled successful");
+        }
     });
-}
+});

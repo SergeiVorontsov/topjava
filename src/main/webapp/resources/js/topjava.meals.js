@@ -1,11 +1,18 @@
 const mealAjaxUrl = "profile/meals/";
-let filterData = [];
 
 const ctx = {
-    ajaxUrl: mealAjaxUrl
+    ajaxUrl: mealAjaxUrl,
+    updateTable: function () {
+        $.ajax({
+            type: "GET",
+            url: ctx.ajaxUrl + "filter",
+            data: $('#filterForm').serialize(),
+        }).done(function (data) {
+            updateTableByData(data);
+        });
+    }
 };
 
-// $(document).ready(function () {
 $(function () {
     makeEditable(
         $("#datatable").DataTable({
@@ -41,20 +48,11 @@ $(function () {
 });
 
 function filterMeal() {
-    filterData = $('#filterForm').serialize();
-    $.ajax({
-        type: "GET",
-        url: ctx.ajaxUrl + "filter",
-        data: filterData,
-    }).done(function (data) {
-        ctx.datatableApi.clear().rows.add(data).draw();
-        successNoty("Filtered");
-    });
+    ctx.updateTable();
 }
 
 function cleanFilter() {
     $('#filterForm').find(":input").val("");
-    filterData = [];
-    updateTable();
+    $.get(mealAjaxUrl, updateTableByData);
     successNoty("Clean filter");
 }

@@ -50,7 +50,7 @@ public class UserTestData {
         return updated;
     }
 
-    public static User getEnabled() {
+    public static User getDisabled() {
         User enabled = new User(user);
         enabled.setEnabled(false);
         return enabled;

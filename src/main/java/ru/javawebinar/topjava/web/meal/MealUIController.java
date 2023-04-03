@@ -29,13 +29,6 @@ public class MealUIController extends AbstractMealController {
         super.delete(id);
     }
 
-    @Override
-    @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void update(@RequestBody Meal meal, @PathVariable int id) {
-        super.update(meal, id);
-    }
-
     @PostMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void create(@RequestParam LocalDateTime localDateTime,

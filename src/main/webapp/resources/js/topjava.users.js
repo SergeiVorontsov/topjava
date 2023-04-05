@@ -46,28 +46,24 @@ $(function () {
                 ]
             ]
         }),
+        $('#datatable').on("click", ':input[name="enabled"]', function () {
+            enableUser($(this));
+        })
     );
 });
 
-
-$('#datatable').on('change', ':input[name="enabled"]', function () {
-    let row = $(this).closest('tr');
-    let id = $(row).attr("id");
-    let checked = $(this).prop("checked");
+function enableUser(checkbox) {
+    let row = $(checkbox).closest('tr');
+    let checked = $(checkbox).is(':checked');
 
     $.ajax({
         type: "POST",
         url: ctx.ajaxUrl + "enable",
-        data: {id: id, enabled: checked},
+        data: {id: $(row).attr("id"), enabled: checked},
     }).done(function () {
-        switch (checked) {
-            case true:
-                row.attr('data-user-enabled', "true");
-                successNoty("Enabled successful");
-                break;
-            case false:
-                row.attr('data-user-enabled', "false");
-                successNoty("Disabled successful");
-        }
+        row.attr('data-user-enabled', checked);
+        successNoty(checked? "Enabled": "Disabled");
+    }).fail(function () {
+        $(checkbox).prop("checked", !checked);
     });
-});
+}

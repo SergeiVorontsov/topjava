@@ -24,7 +24,7 @@ tr[data-meal-excess="true"] {
 }
 
 tr[data-user-enabled="false"] {
-    color: darkgray;
+    opacity: 0.3;
 }
 
 .fa {

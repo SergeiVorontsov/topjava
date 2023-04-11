@@ -29,17 +29,18 @@ $(function () {
             "columns": [
                 {
                     "data": "dateTime",
+                    "render": function (date, type, row) {
+                        if (type === "display") {
+                            return date.substring(0, 10) + " " + date.substring(11, 16);
+                        }
+                        return date;
+                    }
                 },
                 {
                     "data": "description"
                 },
                 {
                     "data": "calories"
-                },
-                {
-                    "data": "excess",
-                    "visible": false,
-                    "searchable": false
                 },
                 {
                     "orderable": false,
@@ -59,7 +60,7 @@ $(function () {
                 ]
             ],
             "createdRow": function (row, data, dataIndex) {
-                data["excess"] ? $(row).attr("data-meal-excess", "true") : $(row).attr("data-meal-excess", "false")
+                $(row).attr("data-meal-excess", data["excess"])
             }
         })
     );

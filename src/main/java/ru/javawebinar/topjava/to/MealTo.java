@@ -1,18 +1,56 @@
 package ru.javawebinar.topjava.to;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.hibernate.validator.constraints.Range;
+import org.springframework.validation.annotation.Validated;
+import ru.javawebinar.topjava.web.json.LocalDateTimeDeserializer;
+import ru.javawebinar.topjava.web.json.LocalDateTimeSerializer;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.beans.ConstructorProperties;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+@Validated
 public class MealTo extends BaseTo {
 
-    private final LocalDateTime dateTime;
 
-    private final String description;
+    @NotNull
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    private LocalDateTime dateTime;
 
-    private final int calories;
+    @NotBlank
+    @Size(min = 2, max = 120)
+    private String description;
 
-    private final boolean excess;
+    @NotNull
+    @Range(min = 10, max = 5000)
+    private Integer calories;
+
+    private boolean excess;
+
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setCalories(Integer calories) {
+        this.calories = calories;
+    }
+
+    public void setExcess(boolean excess) {
+        this.excess = excess;
+    }
+
+    public MealTo() {
+    };
 
     @ConstructorProperties({"id", "dateTime", "description", "calories", "excess"})
     public MealTo(Integer id, LocalDateTime dateTime, String description, int calories, boolean excess) {
@@ -44,11 +82,10 @@ public class MealTo extends BaseTo {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MealTo mealTo = (MealTo) o;
-        return calories == mealTo.calories &&
-                excess == mealTo.excess &&
-                Objects.equals(id, mealTo.id) &&
-                Objects.equals(dateTime, mealTo.dateTime) &&
-                Objects.equals(description, mealTo.description);
+        return excess == mealTo.excess
+                && dateTime.equals(mealTo.dateTime)
+                && description.equals(mealTo.description)
+                && calories.equals(mealTo.calories);
     }
 
     @Override

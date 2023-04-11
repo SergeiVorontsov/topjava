@@ -19,19 +19,19 @@
                     <div class="row">
                         <div class="col-3">
                             <label for="startDate"><spring:message code="meal.startDate"/></label>
-                            <input class="form-control" type="date" name="startDate" id="startDate">
+                            <input class="form-control" name="startDate" id="startDate">
                         </div>
                         <div class="col-3">
                             <label for="endDate"><spring:message code="meal.endDate"/></label>
-                            <input class="form-control" type="date" name="endDate" id="endDate">
+                            <input class="form-control" name="endDate" id="endDate">
                         </div>
                         <div class="offset-2 col-2">
                             <label for="startTime"><spring:message code="meal.startTime"/></label>
-                            <input class="form-control" type="time" name="startTime" id="startTime">
+                            <input class="form-control" name="startTime" id="startTime">
                         </div>
                         <div class="col-2">
                             <label for="endTime"><spring:message code="meal.endTime"/></label>
-                            <input class="form-control" type="time" name="endTime" id="endTime">
+                            <input class="form-control" name="endTime" id="endTime">
                         </div>
                     </div>
                 </form>
@@ -58,7 +58,6 @@
                 <th><spring:message code="meal.dateTime"/></th>
                 <th><spring:message code="meal.description"/></th>
                 <th><spring:message code="meal.calories"/></th>
-                <th></th>
                 <th></th>
                 <th></th>
             </tr>
@@ -116,5 +115,32 @@
 <script>
     i18n["addTitle"] = '<spring:message code="meal.add"/>';
     i18n["editTitle"] = '<spring:message code="meal.edit"/>';
+</script>
+<link rel="stylesheet" href="webjars/datetimepicker/2.5.20-1/jquery.datetimepicker.css">
+<script src="webjars/datetimepicker/2.5.20-1/jquery.js"></script>
+<script src="webjars/datetimepicker/2.5.20-1/build/jquery.datetimepicker.full.min.js"></script>
+<script>
+    jQuery('#dateTime').datetimepicker({
+        format: 'Y-m-d H:i',
+        lang: 'ru'
+    });
+    jQuery('#startDate').datetimepicker({
+        timepicker: false,
+        format: 'Y-m-d',
+        lang: 'ru'
+    });
+    jQuery('#endDate').datetimepicker({
+        timepicker: false,
+        format: 'Y-m-d',
+        lang: 'ru'
+    });
+    jQuery('#startTime').datetimepicker({
+        datepicker: false,
+        format: 'H:i',
+    });
+    jQuery('#endTime').datetimepicker({
+        datepicker: false,
+        format: 'H:i',
+    });
 </script>
 </html>

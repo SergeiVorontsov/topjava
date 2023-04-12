@@ -22,13 +22,19 @@ function updateRow(id) {
     form.find(":input").val("");
     $("#modalTitle").html(i18n["editTitle"]);
     $.get(ctx.ajaxUrl + id, function (data) {
-        let dateTime = data["dateTime"];
-        data["dateTime"] = dateTime.substring(0, 10) + " " + dateTime.substring(11, 16);
+        if(data.hasOwnProperty("dateTime")){
+            formatDateTime(data);
+        }
         $.each(data, function (key, value) {
             form.find("input[name='" + key + "']").val(value);
         });
         $('#editRow').modal();
     });
+}
+
+function formatDateTime(data){
+    let dateTime = data["dateTime"];
+    data["dateTime"] = dateTime.substring(0, 10) + " " + dateTime.substring(11, 16);
 }
 
 function deleteRow(id) {
@@ -48,8 +54,7 @@ function updateTableByData(data) {
 }
 
 function toIso(data) {
-    const dateSplit = data.split(' ');
-    return dateSplit[0] + 'T' + dateSplit[1] + ':00'
+    return data + ":00";
 }
 
 function save() {

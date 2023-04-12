@@ -140,7 +140,7 @@
     });
     jQuery('#endTime').datetimepicker({
         datepicker: false,
-        format: 'H:i',
+        format: 'H:i'
     });
 </script>
 </html>

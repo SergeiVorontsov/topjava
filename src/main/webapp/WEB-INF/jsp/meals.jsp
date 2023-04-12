@@ -79,7 +79,7 @@
 
                     <div class="form-group">
                         <label for="dateTime" class="col-form-label"><spring:message code="meal.dateTime"/></label>
-                        <input type="datetime-local" class="form-control" id="dateTime" name="dateTime"
+                        <input class="form-control" id="dateTime" name="dateTime"
                                placeholder="<spring:message code="meal.dateTime"/>">
                     </div>
 
@@ -111,36 +111,61 @@
 </div>
 <jsp:include page="fragments/footer.jsp"/>
 </body>
-<jsp:include page="fragments/i18n.jsp"/>
-<script>
-    i18n["addTitle"] = '<spring:message code="meal.add"/>';
-    i18n["editTitle"] = '<spring:message code="meal.edit"/>';
-</script>
+<jsp:include page="fragments/i18n.jsp">
+    <jsp:param name="add" value=""/>
+    <jsp:param name="edit" value=""/>
+</jsp:include>
 <link rel="stylesheet" href="webjars/datetimepicker/2.5.20-1/jquery.datetimepicker.css">
 <script src="webjars/datetimepicker/2.5.20-1/jquery.js"></script>
 <script src="webjars/datetimepicker/2.5.20-1/build/jquery.datetimepicker.full.min.js"></script>
 <script>
-    jQuery('#dateTime').datetimepicker({
+    $('#dateTime').datetimepicker({
         format: 'Y-m-d H:i',
         lang: 'ru'
     });
-    jQuery('#startDate').datetimepicker({
+
+    $('#startDate').datetimepicker({
         timepicker: false,
         format: 'Y-m-d',
-        lang: 'ru'
+        lang: 'ru',
+        onShow: function (ctx) {
+            this.setOptions({
+                maxDate: $('#endDate').val() ? $('#endDate').val() : false
+            })
+        }
     });
-    jQuery('#endDate').datetimepicker({
+
+    $('#endDate').datetimepicker({
         timepicker: false,
         format: 'Y-m-d',
-        lang: 'ru'
+        lang: 'ru',
+        onShow: function (ctx) {
+            this.setOptions({
+                minDate: $('#startDate').val() ? $('#startDate').val() : false
+            })
+        }
     });
-    jQuery('#startTime').datetimepicker({
+
+    $('#startTime').datetimepicker({
         datepicker: false,
         format: 'H:i',
+        onShow: function (ctx) {
+            this.setOptions({
+                maxTime: $('#endTime').val() ? $('#endTime').val() : false
+            })
+        }
     });
-    jQuery('#endTime').datetimepicker({
+
+    $('#endTime').datetimepicker({
         datepicker: false,
-        format: 'H:i'
+        format: 'H:i',
+        onShow: function (ctx) {
+            this.setOptions({
+                minTime: $('#startTime').val() ? $('#startTime').val() : false
+            })
+        }
     });
+
+
 </script>
 </html>

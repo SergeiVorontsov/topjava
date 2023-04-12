@@ -41,7 +41,11 @@ public class DateTimeFormatters {
 
         @Override
         public LocalDateTime parse(String text, Locale locale) throws ParseException {
-            return LocalDateTime.parse(text);
+            if (text.length() == 16) {
+                return LocalDateTime.parse(text, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+            } else {
+                return LocalDateTime.parse(text);
+            }
         }
 
         @Override

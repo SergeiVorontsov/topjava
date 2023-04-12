@@ -22,7 +22,7 @@ function updateRow(id) {
     form.find(":input").val("");
     $("#modalTitle").html(i18n["editTitle"]);
     $.get(ctx.ajaxUrl + id, function (data) {
-        if(data.hasOwnProperty("dateTime")){
+        if (data.hasOwnProperty("dateTime")) {
             formatDateTime(data);
         }
         $.each(data, function (key, value) {
@@ -32,7 +32,7 @@ function updateRow(id) {
     });
 }
 
-function formatDateTime(data){
+function formatDateTime(data) {
     let dateTime = data["dateTime"];
     data["dateTime"] = dateTime.substring(0, 10) + " " + dateTime.substring(11, 16);
 }
@@ -53,14 +53,7 @@ function updateTableByData(data) {
     ctx.datatableApi.clear().rows.add(data).draw();
 }
 
-function toIso(data) {
-    return data + ":00";
-}
-
 function save() {
-    let inputDateTime = form.find("input[name='dateTime']");
-    inputDateTime.val(toIso(inputDateTime.val()));
-
     $.ajax({
         type: "POST",
         url: ctx.ajaxUrl,

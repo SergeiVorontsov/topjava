@@ -112,8 +112,8 @@
 <jsp:include page="fragments/footer.jsp"/>
 </body>
 <jsp:include page="fragments/i18n.jsp">
-    <jsp:param name="add" value=""/>
-    <jsp:param name="edit" value=""/>
+    <jsp:param name="add" value="meal.add"/>
+    <jsp:param name="edit" value="meal.edit"/>
 </jsp:include>
 <link rel="stylesheet" href="webjars/datetimepicker/2.5.20-1/jquery.datetimepicker.css">
 <script src="webjars/datetimepicker/2.5.20-1/jquery.js"></script>

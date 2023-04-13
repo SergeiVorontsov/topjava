@@ -23,7 +23,7 @@ function updateRow(id) {
     $("#modalTitle").html(i18n["editTitle"]);
     $.get(ctx.ajaxUrl + id, function (data) {
         if (data.hasOwnProperty("dateTime")) {
-            formatDateTime(data);
+            data["dateTime"] = formatDateTime(data["dateTime"]);
         }
         $.each(data, function (key, value) {
             form.find("input[name='" + key + "']").val(value);
@@ -33,8 +33,8 @@ function updateRow(id) {
 }
 
 function formatDateTime(data) {
-    let dateTime = data["dateTime"];
-    data["dateTime"] = dateTime.substring(0, 10) + " " + dateTime.substring(11, 16);
+    let dateTime = data;
+    return dateTime.substring(0, 10) + " " + dateTime.substring(11, 16);
 }
 
 function deleteRow(id) {

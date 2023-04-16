@@ -12,7 +12,6 @@ import ru.javawebinar.topjava.to.UserTo;
 import ru.javawebinar.topjava.web.SecurityUtil;
 
 import javax.validation.Valid;
-import java.util.Objects;
 
 @Controller
 @RequestMapping("/profile")
@@ -31,7 +30,8 @@ public class ProfileUIController extends AbstractUserController {
             try {
                 super.update(userTo, SecurityUtil.authUserId());
             } catch (DataIntegrityViolationException e) {
-                throw new DataIntegrityViolationException(Objects.requireNonNull(e.getMessage()));
+                result.rejectValue("password", "error.duplicateEmail");
+                return "profile";
             }
             SecurityUtil.get().setTo(userTo);
             status.setComplete();
@@ -55,7 +55,8 @@ public class ProfileUIController extends AbstractUserController {
             try {
                 super.create(userTo);
             } catch (DataIntegrityViolationException e) {
-                throw new DataIntegrityViolationException(Objects.requireNonNull(e.getMessage()));
+                result.rejectValue("password", "error.duplicateEmail");
+                return "profile";
             }
             status.setComplete();
             return "redirect:/login?message=app.registered&username=" + userTo.getEmail();

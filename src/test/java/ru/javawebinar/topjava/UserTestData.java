@@ -40,8 +40,8 @@ public class UserTestData {
         return new User(null, "New", "new@gmail.com", "newPass", 1555, false, new Date(), Collections.singleton(Role.USER));
     }
 
-    public static User getDuplicateAdmin() {
-        return new User(null, "Admin", "admin@gmail.com", "admin", 1900);
+    public static User getWithDuplicateEmail() {
+        return new User(null, "Duplicate", "admin@gmail.com", "duplicate", 2000);
     }
 
     public static User getUpdated() {
@@ -59,7 +59,7 @@ public class UserTestData {
         return JsonUtil.writeAdditionProps(user, "password", passw);
     }
 
-    public static User getUpdatedWithErrorArg() {
+    public static User getWithErrorArgs() {
         User updated = new User(user);
         updated.setEmail("");
         updated.setName("");

@@ -6,16 +6,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
+import java.time.Month;
+
+import static java.time.LocalDateTime.of;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.TestUtil.userHttpBasic;
 import static ru.javawebinar.topjava.UserTestData.USER_ID;
@@ -127,10 +131,36 @@ class MealRestControllerTest extends AbstractControllerTest {
 
     @Test
     public void updateWithNotValidArg() throws Exception {
-        Meal updated = getUpdatedWithErrorArg();
+        Meal updated = getWithErrorArg();
         perform(MockMvcRequestBuilders.put(REST_URL + MEAL1_ID).contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(user))
                 .content(JsonUtil.writeValue(updated)))
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.type").value("VALIDATION_ERROR"));
+    }
+
+    @Test
+    public void createWithNotValidArg() throws Exception {
+        Meal meal = getWithErrorArg();
+        perform(MockMvcRequestBuilders.post(REST_URL).contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(user))
+                .content(JsonUtil.writeValue(meal)))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.type").value("VALIDATION_ERROR"));
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    public void createWithDuplicateDateTime() throws Exception {
+        Meal meal = new Meal(null,
+                of(2020, Month.JANUARY, 30, 10, 0),
+                "Duplicate",
+                125);
+        perform(MockMvcRequestBuilders.post(REST_URL).contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(user))
+                .content(JsonUtil.writeValue(meal)))
+                .andDo(print())
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.type").value("DATA_ERROR"));
     }
 }

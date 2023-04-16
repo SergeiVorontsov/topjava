@@ -7,4 +7,5 @@
     <context:component-scan base-package="ru.javawebinar.**.service"/>
     <context:component-scan base-package="ru.javawebinar.topjava.**.web"/>
     <bean class="org.springframework.security.crypto.password.NoOpPasswordEncoder" id="passwordEncoder"/>
+    <import resource="classpath:spring/spring-mvc.xml"/>
 </beans>

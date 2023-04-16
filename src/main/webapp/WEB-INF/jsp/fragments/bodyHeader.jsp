@@ -5,7 +5,8 @@
 
 <nav class="navbar navbar-dark bg-dark py-0">
     <div class="container">
-        <a href="meals" class="navbar-brand"><img src="resources/images/icon-meal.png"> <spring:message code="app.title"/></a>
+        <a href="meals" class="navbar-brand"><img src="resources/images/icon-meal.png"> <spring:message
+                code="app.title"/></a>
         <sec:authorize access="isAuthenticated()">
             <form:form class="form-inline my-2" action="logout" method="post">
                 <sec:authorize access="hasRole('ADMIN')">
@@ -26,5 +27,19 @@
                 </button>
             </form:form>
         </sec:authorize>
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">${pageContext.response.locale}
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                <button class="dropdown-item" id="en" value="en">English</button>
+                <button class="dropdown-item" id="ru" value="ru">Русский</button>
+            </div>
+        </div>
     </div>
 </nav>
+<script type="text/javascript">
+    $(".dropdown-item").on('click', function (e) {
+        location.href = "?language=" + $(this).val();
+    });
+</script>

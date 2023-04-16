@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.service.UserService;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
@@ -13,8 +15,7 @@ import ru.javawebinar.topjava.web.AbstractControllerTest;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ru.javawebinar.topjava.TestUtil.userHttpBasic;
 import static ru.javawebinar.topjava.UserTestData.*;
 
@@ -146,24 +147,37 @@ class AdminRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void updateWithNotValidArg() throws Exception {
-        User updated = getUpdatedWithErrorArg();
+    public void updateWithNotValidArgs() throws Exception {
+        User user = getWithErrorArgs();
         perform(MockMvcRequestBuilders.put(REST_URL + USER_ID)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(admin))
-                .content(jsonWithPassword(updated, updated.getPassword())))
-                .andExpect(status().isUnprocessableEntity());
+                .content(jsonWithPassword(user, user.getPassword())))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.type").value("VALIDATION_ERROR"));
     }
 
     @Test
+    public void createWithNotValidArgs() throws Exception {
+        User user = getWithErrorArgs();
+        perform(MockMvcRequestBuilders.post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(admin))
+                .content(jsonWithPassword(user, user.getPassword())))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.type").value("VALIDATION_ERROR"));
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
     public void createWithDuplicateEmail() throws Exception {
-        User duplicateUser = getDuplicateAdmin();
+        User duplicateUser = getWithDuplicateEmail();
         perform(MockMvcRequestBuilders.post(REST_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(admin))
                 .content(jsonWithPassword(duplicateUser, duplicateUser.getPassword())))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("\"Some string response\""));
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.type").value("DATA_ERROR"));
     }
 }

@@ -10,7 +10,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,8 +32,12 @@ import static ru.javawebinar.topjava.util.exception.ErrorType.*;
 public class ExceptionInfoHandler {
     private static final Logger log = LoggerFactory.getLogger(ExceptionInfoHandler.class);
 
+    private static MessageSourceAccessor messageSourceAccessor;
+
     @Autowired
-    private MessageSourceAccessor messageSourceAccessor;
+    private void setMessageSourceAccessor(MessageSourceAccessor msa) {
+        ExceptionInfoHandler.messageSourceAccessor = msa;
+    }
 
     //  http://stackoverflow.com/a/22358422/548473
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
@@ -45,23 +49,6 @@ public class ExceptionInfoHandler {
     @ResponseStatus(HttpStatus.CONFLICT)  // 409
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ErrorInfo conflict(HttpServletRequest req, DataIntegrityViolationException e) {
-        ErrorType errorType = VALIDATION_ERROR;
-        String rootMsg = ValidationUtil.getRootCause(e).getMessage();
-        if (rootMsg != null) {
-            String lowerCaseMsg = rootMsg.toLowerCase();
-            if (lowerCaseMsg.contains("users_unique_email_idx")) {
-                logException(req, e, true, errorType);
-                return new ErrorInfo(req.getRequestURL(),
-                        errorType,
-                        messageSourceAccessor.getMessage("error.duplicateEmail"));
-            }
-            if (lowerCaseMsg.contains("meals_unique_user_datetime_idx")) {
-                logException(req, e, true, errorType);
-                return new ErrorInfo(req.getRequestURL(),
-                        errorType,
-                        messageSourceAccessor.getMessage("error.duplicateMeal"));
-            }
-        }
         return logAndGetErrorInfo(req, e, true, DATA_ERROR);
     }
 
@@ -72,11 +59,10 @@ public class ExceptionInfoHandler {
     }
 
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)  // 422
-    @ExceptionHandler({BindException.class, MethodArgumentNotValidException.class})
-    public ErrorInfo bindingError(HttpServletRequest req, BindException e) {
-        ErrorType errorType = VALIDATION_ERROR;
-        logException(req, e, true, errorType);
-        return new ErrorInfo(req.getRequestURL(), errorType, getBindingErrors(e.getBindingResult()));
+    @ExceptionHandler({BindException.class})
+    public ErrorInfo bindingError(HttpServletRequest req, Exception e, BindingResult result) {
+        return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR, result);
+
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -86,18 +72,25 @@ public class ExceptionInfoHandler {
     }
 
     //    https://stackoverflow.com/questions/538870/should-private-helper-methods-be-static-if-they-can-be-static
-    private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType) {
+    private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType, BindingResult... results) {
         Throwable rootCause = ValidationUtil.getRootCause(e);
-        logException(req, rootCause, logException, errorType);
-        return new ErrorInfo(req.getRequestURL(), errorType, rootCause.toString());
-    }
-
-    private static void logException(HttpServletRequest req, Throwable rootCause, boolean logException, ErrorType errorType) {
         if (logException) {
             log.error(errorType + " at request " + req.getRequestURL(), rootCause);
         } else {
             log.warn("{} at request  {}: {}", errorType, req.getRequestURL(), rootCause.toString());
         }
+        if (results.length > 0) {
+            BindingResult result = results[0];
+            return new ErrorInfo(req.getRequestURL(), errorType, getBindingErrors(result));
+        } else if (e instanceof DataIntegrityViolationException) {
+            String lowerCaseMsg = rootCause.getMessage().toLowerCase();
+            if (lowerCaseMsg.contains("users_unique_email_idx")) {
+                return new ErrorInfo(req.getRequestURL(), errorType, messageSourceAccessor.getMessage("error.duplicateEmail"));
+            } else if (lowerCaseMsg.contains("meal_unique_user_datetime_idx")) {
+                return new ErrorInfo(req.getRequestURL(), errorType, messageSourceAccessor.getMessage("error.duplicateMeal"));
+            }
+        }
+        return new ErrorInfo(req.getRequestURL(), errorType, rootCause.getMessage());
     }
 }
 

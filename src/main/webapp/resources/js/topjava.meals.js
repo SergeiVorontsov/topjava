@@ -65,6 +65,8 @@ $(function () {
     });
 
 //  http://xdsoft.net/jqplugins/datetimepicker/
+    $.datetimepicker.setLocale($("#localeMenu").val());
+
     var startDate = $('#startDate');
     var endDate = $('#endDate');
     startDate.datetimepicker({

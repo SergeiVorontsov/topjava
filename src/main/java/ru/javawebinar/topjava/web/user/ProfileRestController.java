@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.web.user;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +10,6 @@ import ru.javawebinar.topjava.to.UserTo;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.Objects;
 
 import static ru.javawebinar.topjava.web.SecurityUtil.authUserId;
 
@@ -35,11 +33,7 @@ public class ProfileRestController extends AbstractUserController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<User> register(@Valid @RequestBody UserTo userTo) {
         User created = null;
-        try {
-            created = super.create(userTo);
-        } catch (DataIntegrityViolationException e) {
-            throw new DataIntegrityViolationException(Objects.requireNonNull(e.getMessage()));
-        }
+        created = super.create(userTo);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(REST_URL).build().toUri();
         return ResponseEntity.created(uriOfNewResource).body(created);
@@ -48,11 +42,7 @@ public class ProfileRestController extends AbstractUserController {
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void update(@Valid @RequestBody UserTo userTo) {
-        try {
-            super.update(userTo, authUserId());
-        } catch (DataIntegrityViolationException e) {
-            throw new DataIntegrityViolationException(Objects.requireNonNull(e.getMessage()));
-        }
+        super.update(userTo, authUserId());
     }
 
     @GetMapping("/text")

@@ -1,6 +1,6 @@
 package ru.javawebinar.topjava.util.exception;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 public class ErrorInfo {
@@ -8,13 +8,9 @@ public class ErrorInfo {
     private final ErrorType type;
     private final List<String> details;
 
-    public ErrorInfo(CharSequence url, ErrorType type, String detail) {
-        this(url, type, Collections.singletonList(detail));
-    }
-
-    public ErrorInfo(CharSequence url, ErrorType type, List<String> detail) {
+    public ErrorInfo(CharSequence url, ErrorType type, String... details) {
         this.url = url.toString();
         this.type = type;
-        this.details = detail;
+        this.details = Arrays.asList(details);
     }
 }

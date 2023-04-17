@@ -30,7 +30,7 @@ public class ProfileUIController extends AbstractUserController {
             try {
                 super.update(userTo, SecurityUtil.authUserId());
             } catch (DataIntegrityViolationException e) {
-                result.rejectValue("password", "error.duplicateEmail");
+                result.rejectValue("email", "error.duplicateEmail");
                 return "profile";
             }
             SecurityUtil.get().setTo(userTo);
@@ -50,12 +50,15 @@ public class ProfileUIController extends AbstractUserController {
     public String saveRegister(@Valid UserTo userTo, BindingResult result, SessionStatus status, ModelMap model) {
         if (result.hasErrors()) {
             model.addAttribute("register", true);
+            userTo.setName(null);
             return "profile";
         } else {
             try {
                 super.create(userTo);
             } catch (DataIntegrityViolationException e) {
-                result.rejectValue("password", "error.duplicateEmail");
+                result.rejectValue("email", "error.duplicateEmail");
+                model.addAttribute("register", true);
+                userTo.setName(null);
                 return "profile";
             }
             status.setComplete();

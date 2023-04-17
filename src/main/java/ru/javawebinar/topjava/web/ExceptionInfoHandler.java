@@ -49,6 +49,12 @@ public class ExceptionInfoHandler {
     @ResponseStatus(HttpStatus.CONFLICT)  // 409
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ErrorInfo conflict(HttpServletRequest req, DataIntegrityViolationException e) {
+        String lowerCaseMsg = ValidationUtil.getRootCause(e).getMessage().toLowerCase();
+        if (lowerCaseMsg.contains("users_unique_email_idx")) {
+            return logAndGetErrorInfo(req, e, true, DATA_ERROR, messageSourceAccessor.getMessage("error.duplicateEmail"));
+        } else if (lowerCaseMsg.contains("meal_unique_user_datetime_idx")) {
+            return logAndGetErrorInfo(req, e, true, DATA_ERROR, messageSourceAccessor.getMessage("error.duplicateMeal"));
+        }
         return logAndGetErrorInfo(req, e, true, DATA_ERROR);
     }
 
@@ -61,7 +67,7 @@ public class ExceptionInfoHandler {
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)  // 422
     @ExceptionHandler({BindException.class})
     public ErrorInfo bindingError(HttpServletRequest req, Exception e, BindingResult result) {
-        return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR, result);
+        return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR, getBindingErrors(result));
 
     }
 
@@ -72,25 +78,18 @@ public class ExceptionInfoHandler {
     }
 
     //    https://stackoverflow.com/questions/538870/should-private-helper-methods-be-static-if-they-can-be-static
-    private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType, BindingResult... results) {
+    private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType, String... messages) {
         Throwable rootCause = ValidationUtil.getRootCause(e);
         if (logException) {
             log.error(errorType + " at request " + req.getRequestURL(), rootCause);
         } else {
             log.warn("{} at request  {}: {}", errorType, req.getRequestURL(), rootCause.toString());
         }
-        if (results.length > 0) {
-            BindingResult result = results[0];
-            return new ErrorInfo(req.getRequestURL(), errorType, getBindingErrors(result));
-        } else if (e instanceof DataIntegrityViolationException) {
-            String lowerCaseMsg = rootCause.getMessage().toLowerCase();
-            if (lowerCaseMsg.contains("users_unique_email_idx")) {
-                return new ErrorInfo(req.getRequestURL(), errorType, messageSourceAccessor.getMessage("error.duplicateEmail"));
-            } else if (lowerCaseMsg.contains("meal_unique_user_datetime_idx")) {
-                return new ErrorInfo(req.getRequestURL(), errorType, messageSourceAccessor.getMessage("error.duplicateMeal"));
-            }
+        if (messages.length > 0) {
+            return new ErrorInfo(req.getRequestURL(), errorType, messages);
+        } else {
+            return new ErrorInfo(req.getRequestURL(), errorType, rootCause.getMessage());
         }
-        return new ErrorInfo(req.getRequestURL(), errorType, rootCause.getMessage());
     }
 }
 

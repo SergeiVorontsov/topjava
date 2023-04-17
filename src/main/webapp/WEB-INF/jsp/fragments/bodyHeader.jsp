@@ -28,10 +28,11 @@
             </form:form>
         </sec:authorize>
         <div class="dropdown">
-            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown"
-                    aria-haspopup="true" aria-expanded="false">${pageContext.response.locale}
+            <button class="btn btn-primary dropdown-toggle" type="button" id="localeMenu" data-toggle="dropdown"
+                    aria-haspopup="true" value="${pageContext.response.locale}"
+                    aria-expanded="false">${pageContext.response.locale}
             </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+            <div class="dropdown-menu" aria-labelledby="localeMenu">
                 <button class="dropdown-item" id="en" value="en">English</button>
                 <button class="dropdown-item" id="ru" value="ru">Русский</button>
             </div>
@@ -39,7 +40,15 @@
     </div>
 </nav>
 <script type="text/javascript">
-    $(".dropdown-item").on('click', function (e) {
-        location.href = "?language=" + $(this).val();
+    $(".dropdown-item").on('click', function () {
+        let currentLocale = $("#localeMenu").val();
+        let selectedLocale = $(this).val();
+        if (selectedLocale !== '') {
+            if ($(location).prop('href').indexOf("?language=") > -1) {
+                $(location).prop('href', $(location).prop('href').replace(currentLocale, selectedLocale));
+            } else {
+                $(location).prop('href', $(location).prop('href') + "?language=" + selectedLocale);
+            }
+        }
     });
 </script>

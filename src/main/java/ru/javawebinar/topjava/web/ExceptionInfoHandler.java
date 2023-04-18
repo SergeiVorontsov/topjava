@@ -85,11 +85,9 @@ public class ExceptionInfoHandler {
         } else {
             log.warn("{} at request  {}: {}", errorType, req.getRequestURL(), rootCause.toString());
         }
-        if (messages.length > 0) {
-            return new ErrorInfo(req.getRequestURL(), errorType, messages);
-        } else {
-            return new ErrorInfo(req.getRequestURL(), errorType, rootCause.getMessage());
-        }
+        return messages.length > 0
+                ? new ErrorInfo(req.getRequestURL(), errorType, messages)
+                : new ErrorInfo(req.getRequestURL(), errorType, rootCause.getMessage());
     }
 }
 

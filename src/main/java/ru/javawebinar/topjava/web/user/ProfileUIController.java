@@ -50,7 +50,6 @@ public class ProfileUIController extends AbstractUserController {
     public String saveRegister(@Valid UserTo userTo, BindingResult result, SessionStatus status, ModelMap model) {
         if (result.hasErrors()) {
             model.addAttribute("register", true);
-            userTo.setName(null);
             return "profile";
         } else {
             try {
@@ -58,7 +57,6 @@ public class ProfileUIController extends AbstractUserController {
             } catch (DataIntegrityViolationException e) {
                 result.rejectValue("email", "error.duplicateEmail");
                 model.addAttribute("register", true);
-                userTo.setName(null);
                 return "profile";
             }
             status.setComplete();
